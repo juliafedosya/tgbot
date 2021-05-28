@@ -21,28 +21,25 @@ app.post('/', (req, res) => {
         sortBy: 'relevancy',
         page: 1
     }).then(resp => {
-        const firstUrl = 'Here are the latest news for ' + sentMessage + " : " + resp.articles[0].title + " \n" + resp.articles[0].url;
-        console.log(firstUrl);
+        const articles = resp.articles;
+        let firstUrl;
+        if (articles && articles.length) {
+            firstUrl = 'Here are the latest news for ' + sentMessage + " : " + resp.articles[0].title + " \n" + resp.articles[0].url;
+        } else {
+            firstUrl = 'nothing found';
+        }
+
         axios.post(`${url}${apiToken}/sendMessage`, {
                 chat_id: chatId,
                 text: firstUrl
             })
             .then((response) => {
-                res.status(200).send(response);
+                res.status(200).send('Nothing found');
             }).catch((error) => {
-                console.log(error);
+                res.send(error);
             });
-        res.send(req.body);
     }).catch((error) => {
-        axios.post(`${url}${apiToken}/sendMessage`, {
-                chat_id: chatId,
-                text: 'Nothing found 🤷‍♀️'
-            })
-            .then((response) => {
-                res.status(200).send(response);
-            }).catch((error) => {
-                console.log(error);
-            });
+        console.log(error);
     });
 });
 // Listening
